@@ -3,6 +3,7 @@ const addBtn = document.querySelector(".add-btn");
 const inputField = document.querySelector(".input");
 const ulEl = document.querySelector(".todo-container");
 const radioContainer = document.querySelector(".radio-container");
+const headerEl = document.querySelector(".header");
 
 const filterOptions = ["all", "done", "open"];
 
@@ -58,12 +59,11 @@ function updateStyling(liElement, checkbox, isDone) {
   }
 }
 
-// render();
-
 addBtn.addEventListener("click", () => {
   addInput();
   inputField.value = "";
 });
+
 
 inputField.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
