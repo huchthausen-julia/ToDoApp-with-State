@@ -3,18 +3,29 @@ const addBtn = document.querySelector(".add-btn");
 const inputField = document.querySelector(".input");
 const ulEl = document.querySelector(".todo-container");
 const radioContainer = document.querySelector(".radio-container");
-const headerEl = document.querySelector(".header");
+let newLiElement;
+let newInputElement;
+let newToDo;
 
 const filterOptions = ["all", "done", "open"];
 
-const toDoAppState = {
+let toDoAppState = {
   filter: "all",
   todos: [
-    { id: 1, description: "Learn HTML", done: false },
-    { id: 2, description: "Learn CSS", done: false },
-    { id: 3, description: "Learn JS", done: false },
+    { id: 1, description: "neue Sprache lernen", done: false },
+    { id: 2, description: "Movement", done: false },
+    { id: 3, description: "ein tolles Buch lesen", done: false },
   ],
 };
+
+function toDoAppStateDataFromLocalStorage() {
+  const toDoAppStateJSON = localStorage.getItem("toDoAppState");
+  if (toDoAppStateJSON) {
+    toDoAppState = JSON.parse(toDoAppStateJSON);
+  }
+}
+
+toDoAppStateDataFromLocalStorage();
 
 function render() {
   ulEl.innerHTML = "";
@@ -30,6 +41,9 @@ function render() {
     ) {
       const newLi = document.createElement("li");
       const newInput = document.createElement("input");
+
+      newLi.setAttribute("data-id", todo.id);
+
       newInput.addEventListener("change", () => {
         todo.done = newInput.checked; // synchronisation vom state und nutzeroberfläche
         render();
@@ -47,6 +61,7 @@ function render() {
   }
 }
 
+toDoAppStateDataFromLocalStorage();
 render();
 
 function updateStyling(liElement, checkbox, isDone) {
@@ -62,8 +77,10 @@ function updateStyling(liElement, checkbox, isDone) {
 addBtn.addEventListener("click", () => {
   addInput();
   inputField.value = "";
-});
 
+  updateStyling(newLiElement, newInputElement, newToDo.done);
+  saveToDoAppStateToLocalStorage();
+});
 
 inputField.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
@@ -84,8 +101,8 @@ function addInput() {
     console.log("Generierte ID:", newToDo.id);
     toDoAppState.todos.push(newToDo);
 
-    const newLiElement = document.createElement("li");
-    const newInputElement = document.createElement("input");
+    newLiElement = document.createElement("li");
+    newInputElement = document.createElement("input");
     const liText = document.createTextNode(newToDo.description);
 
     newInputElement.setAttribute("type", "checkbox");
@@ -99,11 +116,21 @@ function addInput() {
     ulEl.appendChild(newLiElement);
 
     inputField.value = "";
+
+    updateStyling(newLiElement, newInputElement, newToDo.done);
+    saveToDoAppStateToLocalStorage(); // aktuellen Stand speichern, wenn ein neues Todo hinzugefügt wird
   } else {
     alert("unzulässige Eingabe!");
     inputField.value = "";
   }
 }
+
+function saveToDoAppStateToLocalStorage() {
+  const toDoAppStateJSON = JSON.stringify(toDoAppState);
+  localStorage.setItem("toDoAppState", toDoAppStateJSON);
+}
+
+saveToDoAppStateToLocalStorage();
 
 remBtn.addEventListener("click", () => {
   const checkboxesChecked = ulEl.querySelectorAll(
@@ -112,8 +139,15 @@ remBtn.addEventListener("click", () => {
 
   checkboxesChecked.forEach((checkbox) => {
     const li = checkbox.parentElement;
+    const todoId = parseInt(li.getAttribute("data-id"), 10);
+
+    // entfernt ToDo aus dem state anhand der id
+    toDoAppState.todos = toDoAppState.todos.filter(
+      (todo) => todo.id !== todoId
+    );
     li.remove();
   });
+  saveToDoAppStateToLocalStorage();
 });
 
 //aktualisieren des Filters im toDoAppState und Neuzeichnen der Liste
