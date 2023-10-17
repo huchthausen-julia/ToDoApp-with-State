@@ -134,9 +134,9 @@ input[type="radio"]:focus {
     padding: 0.5rem 0; 
   }
 
-  .input,
-  .add-btn {
-    width: 100%; 
+  .input {
+    height: 2.5rem;  
+    margin-right: 2rem;
   }
 
   .todo-container li {
